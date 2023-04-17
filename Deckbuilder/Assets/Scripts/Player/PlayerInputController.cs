@@ -34,8 +34,8 @@ public class PlayerInputController : MonoBehaviour,PlayerControllers.IPlayerCont
     {
         print("StartDrag");
         Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
-        RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
-        if (hit.collider != null && (hit.collider.gameObject.CompareTag("Draggable") ||
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit) && (hit.collider.gameObject.CompareTag("Draggable") ||
                                      hit.collider.gameObject.layer == LayerMask.NameToLayer("Draggable") ||
                                      hit.collider.gameObject.GetComponent<IDrag>() != null))
         {
