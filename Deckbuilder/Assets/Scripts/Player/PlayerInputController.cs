@@ -12,8 +12,7 @@ public class PlayerInputController : MonoBehaviour,PlayerControllers.IPlayerCont
     [SerializeField] private float mouseDragSpeed = .1f;
     private Vector3 velocity = Vector3.zero;
 
-    private WaitForFixedUpdate _fixedUpdate = new WaitForFixedUpdate();
-
+    private bool IsDragging = false;
     private void Awake()
     {
         mainCamera = Camera.main;
@@ -29,16 +28,16 @@ public class PlayerInputController : MonoBehaviour,PlayerControllers.IPlayerCont
         _playerControllers.PlayerController.SetCallbacks(this);
         _playerControllers.Enable();
     }
-
+    
     void StartDrag()
     {
-        print("StartDrag");
         Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit) && (hit.collider.gameObject.CompareTag("Draggable") ||
+        if (Physics.Raycast(ray, out hit) && !IsDragging && (hit.collider.gameObject.CompareTag("Draggable") ||
                                      hit.collider.gameObject.layer == LayerMask.NameToLayer("Draggable") ||
-                                     hit.collider.gameObject.GetComponent<IDrag>() != null))
+                                     hit.collider.gameObject.GetComponent<DraggableObject>() != null))
         {
+            IsDragging = true;
             StartCoroutine(DragUpdate(hit.collider.gameObject));
         }
 
@@ -46,9 +45,9 @@ public class PlayerInputController : MonoBehaviour,PlayerControllers.IPlayerCont
 
     private IEnumerator DragUpdate(GameObject clickedObject)
     {
-        clickedObject.TryGetComponent<IDrag>(out var iDragComponent);
+        clickedObject.TryGetComponent<DraggableObject>(out var iDragComponent);
         float initialDistance = Vector3.Distance(clickedObject.transform.position, mainCamera.transform.position);
-        iDragComponent?.OnStartDrag();
+        iDragComponent.OnStartDrag();
         while (_playerControllers.PlayerController.Click.ReadValue<float>() != 0)
         {
             Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
@@ -56,12 +55,14 @@ public class PlayerInputController : MonoBehaviour,PlayerControllers.IPlayerCont
                 ray.GetPoint(initialDistance), ref velocity, mouseDragSpeed);
             yield return null;
         }
-        iDragComponent?.OnEndDrag();
+        iDragComponent.OnEndDrag();
+        IsDragging = false;
+        yield return null;
     }
 
     public void OnClick(InputAction.CallbackContext context)
     {
-        if(!context.performed) return;
+        if (!context.performed) return;
         StartDrag();
     }
 }

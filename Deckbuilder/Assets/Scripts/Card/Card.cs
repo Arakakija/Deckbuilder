@@ -1,28 +1,26 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class Card : MonoBehaviour,IDrag, IPointerEnterHandler,IPointerExitHandler
+public class Card : DraggableObject
 {
-    public void OnStartDrag()
-    {
-        
-    }
-
-    public void OnEndDrag()
-    {
-        
-    }
+    public Vector3 initPosition;
     
-    public void OnPointerEnter(PointerEventData eventData)
+    public override void OnStartDrag()
     {
-        Debug.Log("Entro Mouse");
+        initPosition = transform.position;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public override void OnEndDrag()
     {
-        Debug.Log("Salio Mouse");
+        print("Entro");
+        transform.DOMove(initPosition, 1f);
+    }
+
+    protected override bool DragSuccessful()
+    {
+        return true;
     }
 }
