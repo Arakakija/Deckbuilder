@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using TMPro;
 using UnityEngine.UI;
 
 [ExecuteInEditMode]
@@ -7,11 +8,14 @@ public class ManaPoolVisual : MonoBehaviour {
 
     public int TestFullCrystals;
     public int TestTotalCrystalsThisTurn;
+    public bool canOverflow = false;
 
     public Image[] Crystals;
-    public Text ProgressText;
+    public TextMeshProUGUI ProgressText;
 
     private int totalCrystals;
+
+  
     public int TotalCrystals
     {
         get{ return totalCrystals; }
@@ -52,7 +56,7 @@ public class ManaPoolVisual : MonoBehaviour {
         {
             //Debug.Log("Changed mana this turn to: " + value);
 
-            if (value > totalCrystals)
+            if (value > totalCrystals && !canOverflow)
                 availableCrystals = totalCrystals;
             else if (value < 0)
                 availableCrystals = 0;
