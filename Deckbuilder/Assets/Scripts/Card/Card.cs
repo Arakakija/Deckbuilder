@@ -16,7 +16,7 @@ public class Card : DraggableObject
     public override void OnEndDrag()
     {
         print("Entro");
-        transform.DOMove(initPosition, 1f);
+        transform.DOMove(initPosition, 0.5f);
     }
 
     protected override bool DragSuccessful()

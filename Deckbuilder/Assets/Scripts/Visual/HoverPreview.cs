@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using DG.Tweening;
+using UnityEngine.EventSystems;
 
-public class HoverPreview: MonoBehaviour
+public class HoverPreview: MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     // PUBLIC FIELDS
     public GameObject TurnThisOffWhenPreviewing;  // if this is null, will not turn off anything 
@@ -49,22 +50,7 @@ public class HoverPreview: MonoBehaviour
     {
         ThisPreviewEnabled = ActivateInAwake;
     }
-            
-    void OnMouseEnter()
-    {
-        OverCollider = true;
-        if (PreviewsAllowed && ThisPreviewEnabled)
-            PreviewThisObject();
-    }
-        
-    void OnMouseExit()
-    {
-        OverCollider = false;
-
-        if (!PreviewingSomeCard())
-            StopAllPreviews();
-    }
-
+    
     // OTHER METHODS
     void PreviewThisObject()
     {
@@ -100,11 +86,7 @@ public class HoverPreview: MonoBehaviour
     {
         if (currentlyViewing != null)
         {
-            currentlyViewing.previewGameObject.SetActive(false);
-            currentlyViewing.previewGameObject.transform.localScale = Vector3.one;
-            currentlyViewing.previewGameObject.transform.localPosition = Vector3.zero;
-            if (currentlyViewing.TurnThisOffWhenPreviewing!=null)
-                currentlyViewing.TurnThisOffWhenPreviewing.SetActive(true); 
+            currentlyViewing.StopThisPreview();
         }
          
     }
@@ -125,5 +107,18 @@ public class HoverPreview: MonoBehaviour
         return false;
     }
 
-   
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        OverCollider = true;
+        if (PreviewsAllowed && ThisPreviewEnabled)
+            PreviewThisObject();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        OverCollider = false;
+        if (!PreviewingSomeCard())
+            StopAllPreviews();
+    }
 }
